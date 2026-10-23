@@ -1,2 +1,2 @@
-RAG projekt för case hos complieit
+RAG projekt för case hos compileit
 
