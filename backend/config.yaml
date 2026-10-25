@@ -4,3 +4,6 @@ temperature: 0.2
 max_tokens: 500
 input_price_per_m: 0.40
 output_price_per_m: 1.60
+
+sitemap_url: https://compileit.com/sitemap.xml
+skip_paths: []
