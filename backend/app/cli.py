@@ -1,4 +1,5 @@
 import time
+import uuid
 
 from app.agent import build_agent, make_search_tool
 from app.config import BACKEND_DIR, load_config
@@ -7,10 +8,14 @@ from app.llm import get_chat_model, get_embedding_model
 from app.log import log_messages
 from langgraph.graph.state import CompiledStateGraph
 
-def ask_question(agent: CompiledStateGraph, config: dict, question: str)-> str:
-    """ Run agent with question, log hits and usage. Return answer """
+def ask_question(agent: CompiledStateGraph, config: dict, question: str, thread_id: str)-> str:
+    """ Run agent with question in thread, log hits and usage. Return answer"""
     start = time.perf_counter()
-    result = agent.invoke({"messages": [("human", question)]})
+    # LangGraph's config, not the app's config
+    result = agent.invoke(
+        {"messages": [("human", question)]},
+        config={"configurable": {"thread_id": thread_id}},
+    )
     seconds = time.perf_counter() - start
 
     log_messages(result["messages"], seconds, config)
@@ -25,11 +30,13 @@ def main() -> None:
     chunks, matrix = load_index(BACKEND_DIR / "data")
     search_tool = make_search_tool(embed_model, chunks, matrix, config)
     agent = build_agent(model, search_tool, config)
+    # One terminal chat is one session
+    thread_id = str(uuid.uuid4())
     while True:
         question = input("Fråga: ")
         if question == "exit":
             break
-        print(ask_question(agent, config, question))
+        print(ask_question(agent, config, question, thread_id))
     
 if __name__ == "__main__":
     

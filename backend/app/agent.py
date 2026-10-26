@@ -1,6 +1,7 @@
-from langchain_core.messages import SystemMessage, ToolMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.tools import BaseTool, tool
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.graph import START, MessagesState, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 from langgraph.prebuilt import ToolNode, tools_condition
@@ -26,14 +27,14 @@ def make_search_tool(embed_model: OpenAIEmbeddings, chunks: list[dict], matrix: 
 
 
 def build_agent(model: ChatOpenAI, search_tool:BaseTool, config: dict) -> CompiledStateGraph:
-    """Graph with agents and tool nodes. First call always search"""
+    """Graph with agents and tool nodes. Search forced on every new question. Memory per thread"""
 
     def agent(state: MessagesState) -> dict:
-        has_searched = any(isinstance(m, ToolMessage) for m in state["messages"])
-        if has_searched:
-            bound = model.bind_tools([search_tool])
-        else:
+        # New question from the user: force a search
+        if isinstance(state["messages"][-1], HumanMessage):
             bound = model.bind_tools([search_tool], tool_choice="required")
+        else:
+            bound = model.bind_tools([search_tool])
         messages = [SystemMessage(config["system_prompt"])] + state["messages"]
         return {"messages": [bound.invoke(messages)]}
 
@@ -43,7 +44,7 @@ def build_agent(model: ChatOpenAI, search_tool:BaseTool, config: dict) -> Compil
     graph.add_edge(START, "agent")
     graph.add_conditional_edges("agent", tools_condition)
     graph.add_edge("tools", "agent")
-    return graph.compile()
+    return graph.compile(checkpointer=InMemorySaver())
 
 
 def save_graph(agent: CompiledStateGraph, path: Path) -> None:

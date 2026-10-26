@@ -1,5 +1,5 @@
 from rich.console import Console
-from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, ToolMessage
 
 def calc_cost(input_tokens:int, output_tokens: int, config: dict) -> float:
     """ Calculate token cost in $ """
@@ -22,10 +22,12 @@ def log_hits(hits: list[dict]) -> None:
         
         
 def log_messages(messages: list[BaseMessage], seconds: float, config: dict) -> None:
-    """Log hit from tool message and summed tokens from all model calls"""
+    """Log last hit, message and summed tokens"""
     input_tokens = 0
     output_tokens = 0
-    for message in messages:
+    # Only messages after the latest question
+    last_human = max(i for i, m in enumerate(messages) if isinstance(m, HumanMessage))
+    for message in messages[last_human + 1:]:
         if isinstance(message, ToolMessage):
             log_hits(message.artifact)
         elif isinstance(message, AIMessage):
