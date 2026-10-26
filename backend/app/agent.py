@@ -46,6 +46,14 @@ def build_agent(model: ChatOpenAI, search_tool:BaseTool, config: dict) -> Compil
     graph.add_edge("tools", "agent")
     return graph.compile(checkpointer=InMemorySaver())
 
+def load_agent(config: dict) -> CompiledStateGraph:
+    """Load models, index, build agents"""
+    model = get_chat_model(config)
+    embed_model = get_embedding_model(config)
+    chunks, matrix = load_index(BACKEND_DIR / "data")
+    search_tool = make_search_tool(embed_model, chunks, matrix, config)
+    return build_agent(model, search_tool, config)
+
 
 def save_graph(agent: CompiledStateGraph, path: Path) -> None:
     """Write Mermaid graph from agent"""
@@ -55,9 +63,5 @@ def save_graph(agent: CompiledStateGraph, path: Path) -> None:
 
 if __name__ == "__main__":
     config = load_config()
-    model = get_chat_model(config)
-    embed_model = get_embedding_model(config)
-    chunks, matrix = load_index(BACKEND_DIR / "data")
-    search_tool = make_search_tool(embed_model, chunks, matrix, config)
-    agent = build_agent(model, search_tool, config)
+    agent = load_agent(config)
     save_graph(agent, BACKEND_DIR.parent / "docs" / "agent-graph.md")

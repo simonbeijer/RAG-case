@@ -1,10 +1,8 @@
 import time
 import uuid
 
-from app.agent import build_agent, make_search_tool
-from app.config import BACKEND_DIR, load_config
-from app.index import load_index
-from app.llm import get_chat_model, get_embedding_model
+from app.agent import load_agent
+from app.config import load_config
 from app.log import log_messages
 from langgraph.graph.state import CompiledStateGraph
 
@@ -25,11 +23,7 @@ def ask_question(agent: CompiledStateGraph, config: dict, question: str, thread_
 def main() -> None:
     """ Get config, index and models. Start loop for questions """
     config = load_config()
-    model = get_chat_model(config)
-    embed_model = get_embedding_model(config)
-    chunks, matrix = load_index(BACKEND_DIR / "data")
-    search_tool = make_search_tool(embed_model, chunks, matrix, config)
-    agent = build_agent(model, search_tool, config)
+    agent = load_agent(config)
     # One terminal chat is one session
     thread_id = str(uuid.uuid4())
     while True:
