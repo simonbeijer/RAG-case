@@ -12,3 +12,9 @@ def log_usage(input_tokens: int, output_tokens: int, seconds: float, config: dic
     Console().print(
         f"[dim]in: {input_tokens} | ut: {output_tokens} | ${cost:.6f} | {seconds:.2f} s[/dim]"
     )
+
+def log_hits(hits: list[dict]) -> None:
+    """Print url and score for every hit with rich package"""
+    console = Console()
+    for hit in hits:
+        console.print(f"[dim]    {hit['url']} | {hit['score']:.3f}[/dim]")

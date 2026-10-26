@@ -10,3 +10,9 @@ skip_paths: []
 
 chunk_size: 800
 chunk_overlap: 100
+
+embedding_model: openai/text-embedding-3-small
+embedding_price_per_m: 0.02
+
+k: 5
+score_threshold: 0.3

@@ -3,6 +3,8 @@ import time
 from app.config import BACKEND_DIR, load_config
 from app.chunk import chunk_pages, save_chunks
 from app.scrape import clean_page, fetch_page, get_urls, save_pages
+from app.index import embed_chunks, save_embeddings
+from app.llm import get_embedding_model
 
 def scrape_site(config: dict) -> list[dict]:
     """Fetch and clean pages one at a time. Skip pages under 100 characters (3 retry). Return pages with url, title, text"""
@@ -23,7 +25,7 @@ def scrape_site(config: dict) -> list[dict]:
     return pages
 
 def main() -> None:
-    """Load config, scrape and chunk. Save to data/pages.json and data/chunks.json"""
+    """Load config, scrape, chunk and embed. Save to data/pages.json, data/chunks.json and data/embeddings.npy"""
     config = load_config()
     pages = scrape_site(config)
     data_dir = BACKEND_DIR / "data"
@@ -31,6 +33,9 @@ def main() -> None:
     save_pages(pages, data_dir / "pages.json")
     chunks = chunk_pages(pages, config)
     save_chunks(chunks, data_dir / "chunks.json")
+    embed_model = get_embedding_model(config)
+    matrix = embed_chunks(chunks, embed_model)
+    save_embeddings(matrix, data_dir / "embeddings.npy")
 
 
 if __name__ == "__main__":

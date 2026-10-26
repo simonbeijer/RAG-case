@@ -15,4 +15,5 @@ def load_config() -> dict:
         config = yaml.safe_load(f)
 
     config["system_prompt"] = (BACKEND_DIR / "prompts" / "system.md").read_text(encoding="utf-8")
+    config["no_source"] = (BACKEND_DIR / "prompts" / "no_source.md").read_text(encoding="utf-8")
     return config
