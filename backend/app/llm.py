@@ -10,6 +10,7 @@ def get_chat_model(config: dict) -> ChatOpenAI:
         base_url=config["base_url"],
         temperature=config["temperature"],
         max_tokens=config["max_tokens"],
+        stream_usage=True,
         api_key=os.environ["OPENROUTER_API_KEY"],
     )
 

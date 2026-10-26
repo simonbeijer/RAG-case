@@ -8,3 +8,5 @@ ingest:
 
 test:
 	cd backend && uv run pytest
+api:
+	cd backend && uv run uvicorn app.api:app --reload
