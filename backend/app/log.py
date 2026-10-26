@@ -29,6 +29,8 @@ def log_messages(messages: list[BaseMessage], seconds: float, config: dict) -> N
         if isinstance(message, ToolMessage):
             log_hits(message.artifact)
         elif isinstance(message, AIMessage):
+            for tool_call in message.tool_calls:
+                Console().print(f"[dim]    sökfråga: {tool_call['args']['query']}[/dim]")
             input_tokens += message.usage_metadata["input_tokens"]
             output_tokens += message.usage_metadata["output_tokens"]
     log_usage(input_tokens, output_tokens, seconds, config)
