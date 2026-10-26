@@ -1,29 +1,20 @@
 import time
 
+from app.agent import build_agent, make_search_tool
 from app.config import BACKEND_DIR, load_config
-from app.index import load_index, search
+from app.index import load_index
 from app.llm import get_chat_model, get_embedding_model
-from app.log import log_hits, log_usage
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-import numpy as np
+from app.log import log_messages
+from langgraph.graph.state import CompiledStateGraph
 
-def ask_question(model: ChatOpenAI, embed_model: OpenAIEmbeddings,chunks: list[dict], matrix: np.ndarray, config: dict, question: str)-> str:
-    """ Search chunks, add hit to prompts, ask model, log hits and usage. and return answer """
-    hits = search(question, embed_model, chunks, matrix, config)
-    log_hits(hits)
-    # Empty list joins to "", then "or" picks the fallback
-    sources = "\n\n".join(f"Källa: {hit['url']}\n{hit['text']}" for hit in hits) or config["no_source"]
-    messages = [
-        ("system", config["system_prompt"]),
-        ("human", f"{sources}\n\nFråga: {question}"),
-    ]
+def ask_question(agent: CompiledStateGraph, config: dict, question: str)-> str:
+    """ Run agent with question, log hits and usage. Return answer """
     start = time.perf_counter()
-    response = model.invoke(messages)
+    result = agent.invoke({"messages": [("human", question)]})
     seconds = time.perf_counter() - start
 
-    usage = response.usage_metadata
-    log_usage(usage["input_tokens"], usage["output_tokens"], seconds, config)
-    return response.content
+    log_messages(result["messages"], seconds, config)
+    return result["messages"][-1].content
 
 
 def main() -> None:
@@ -32,11 +23,13 @@ def main() -> None:
     model = get_chat_model(config)
     embed_model = get_embedding_model(config)
     chunks, matrix = load_index(BACKEND_DIR / "data")
+    search_tool = make_search_tool(embed_model, chunks, matrix, config)
+    agent = build_agent(model, search_tool, config)
     while True:
         question = input("Fråga: ")
         if question == "exit":
             break
-        print(ask_question(model, embed_model, chunks, matrix, config, question))
+        print(ask_question(agent, config, question))
     
 if __name__ == "__main__":
     
