@@ -1,6 +1,7 @@
 import time
 
 from app.config import BACKEND_DIR, load_config
+from app.chunk import chunk_pages, save_chunks
 from app.scrape import clean_page, fetch_page, get_urls, save_pages
 
 def scrape_site(config: dict) -> list[dict]:
@@ -22,12 +23,14 @@ def scrape_site(config: dict) -> list[dict]:
     return pages
 
 def main() -> None:
-    """Load config, scrape and save to data/pages.json"""
+    """Load config, scrape and chunk. Save to data/pages.json and data/chunks.json"""
     config = load_config()
     pages = scrape_site(config)
     data_dir = BACKEND_DIR / "data"
     data_dir.mkdir(exist_ok=True)
     save_pages(pages, data_dir / "pages.json")
+    chunks = chunk_pages(pages, config)
+    save_chunks(chunks, data_dir / "chunks.json")
 
 
 if __name__ == "__main__":
