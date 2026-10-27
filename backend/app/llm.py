@@ -11,7 +11,7 @@ def get_chat_model(config: dict) -> ChatOpenAI:
         temperature=config["temperature"],
         max_tokens=config["max_tokens"],
         stream_usage=True,
-        api_key=os.environ["OPENROUTER_API_KEY"],
+        api_key=os.environ["LLM_API_KEY"],
     )
 
 def get_embedding_model(config: dict) -> OpenAIEmbeddings:
@@ -19,6 +19,6 @@ def get_embedding_model(config: dict) -> OpenAIEmbeddings:
     return OpenAIEmbeddings(
         model=config["embedding_model"],
         base_url=config["base_url"],
-        api_key=os.environ["OPENROUTER_API_KEY"],
+        api_key=os.environ["LLM_API_KEY"],
         check_embedding_ctx_length=False,
     )
