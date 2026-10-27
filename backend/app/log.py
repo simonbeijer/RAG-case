@@ -1,4 +1,5 @@
 from rich.console import Console
+from rich.markup import escape
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, ToolMessage
 
 def calc_cost(input_tokens:int, output_tokens: int, config: dict) -> float:
@@ -32,7 +33,9 @@ def log_messages(messages: list[BaseMessage], seconds: float, config: dict) -> N
             log_hits(message.artifact)
         elif isinstance(message, AIMessage):
             for tool_call in message.tool_calls:
-                Console().print(f"[dim]    sökfråga: {tool_call['args']['query']}[/dim]")
+                Console().print(f"[dim]    sökfråga: {escape(tool_call['args']['query'])}[/dim]")
             input_tokens += message.usage_metadata["input_tokens"]
             output_tokens += message.usage_metadata["output_tokens"]
+    if messages[-1].response_metadata.get("finish_reason") == "length":
+        Console().print("[yellow]Varning: svaret klipptes av vid max_tokens[/yellow]")
     log_usage(input_tokens, output_tokens, seconds, config)

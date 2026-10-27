@@ -27,9 +27,15 @@ def main() -> None:
     # One terminal chat is one session
     thread_id = str(uuid.uuid4())
     while True:
-        question = input("Fråga: ")
+        question = input("Fråga: ").strip()
         if question == "exit":
             break
+        if not question:
+            print("Frågan är tom.")
+            continue
+        if len(question) > config["max_question_chars"]:
+            print("Frågan är för lång.")
+            continue
         print(ask_question(agent, config, question, thread_id))
     
 if __name__ == "__main__":

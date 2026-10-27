@@ -69,4 +69,6 @@ async def chat(request: ChatQuestion) -> StreamingResponse:
     question = request.question.strip()
     if not question:
         raise HTTPException(status_code=400, detail="Frågan är tom.")
+    if len(question) > config["max_question_chars"]:
+        raise HTTPException(status_code=400, detail="Frågan är för lång.")
     return StreamingResponse(stream_answer(question, request.thread_id), media_type="text/event-stream")
