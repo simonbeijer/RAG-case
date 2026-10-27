@@ -39,6 +39,7 @@ embedding_model: text-embedding-3-small
 - **Testbart.** Terminalchatten loggar sökfråga, träffar, tokens, kostnad och tid för varje svar.
 - **Styrbart.** Allt som påverkar svaret ligger i `backend/config.yaml` och `backend/prompts/`.
 - **Billig modell.** Hämtningen och prompten ska göra svaren bra, inte en dyr modell.
+- **Agent med verktyg.** En LangGraph-graf med verktyget `search_knowledge_base`. Sökningen är tvingad (`tool_choice="required"`), så modellen söker alltid innan den svarar.
 
 ## Testfrågor
 - Vad erbjuder ni för typer av AI-tjänster?
@@ -50,6 +51,9 @@ embedding_model: text-embedding-3-small
 ## Antaganden
 - Körs lokalt.
 - Minnet försvinner vid omstart.
+
+## Känt fel
+Frågor om enskilda medarbetare kan ge fel stad. På medarbetarsidorna ligger kollegornas kort i samma chunk som personens egna uppgifter, och modellen kopplar fel stad till personen. Lösning: ta bort kollegornas kort i rensningen (`backend/app/scrape.py`), så att varje chunk bara innehåller personens egen text.
 
 ## Säkerhet i en riktig produkt
 Chatten körs lokalt, så de här hålen är inte fyllda:

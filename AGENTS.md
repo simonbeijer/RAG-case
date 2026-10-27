@@ -35,12 +35,21 @@ When something goes wrong, we stop and talk before we fix.
 - Do not commit or push. Do not add yourself as author.
 
 ## Run
-From `backend/`:
+From the repo root:
 
 ```
-uv sync
-uv run python -m app.cli
+make setup     # install backend packages
+make ingest    # fetch the site and build the index
+make chat      # terminal chat with logs
+make api       # FastAPI server
+make test      # pytest
 ```
+
+Frontend: `npm run dev` in `frontend/`.
+
+## Test
+`make test` runs the unit tests. After every change to the prompt or `backend/config.yaml`,
+run the test questions from the README by hand and compare the answers.
 
 ## This file
 It grows with the project. Suggest changes when you see a need, but do not edit it without asking.
