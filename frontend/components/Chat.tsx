@@ -68,15 +68,14 @@ export default function Chat() {
   }, [messages]);
 
   return (
-    <section className="flex flex-1 flex-col overflow-hidden rounded-[28px] bg-white shadow-[0_12px_32px_rgba(11,13,23,0.06)]">
+    <section className="flex flex-1 flex-col overflow-clip rounded-[28px] bg-white shadow-[0_12px_32px_rgba(11,13,23,0.06)]">
       <main className="flex flex-1 flex-col gap-6 px-[clamp(16px,4vw,48px)] py-8">
         {messages.map((message, index) => (
           <Message key={index} message={message} />
         ))}
-        <div ref={bottomRef} />
       </main>
 
-      <footer className="flex flex-col gap-2.5 border-t border-line px-[clamp(16px,4vw,48px)] pt-4 pb-5">
+      <footer className="sticky bottom-0 flex flex-col gap-2.5 border-t border-line bg-white px-[clamp(16px,4vw,48px)] pt-4 pb-5">
         <div className="flex flex-wrap gap-2">
           {suggestions.map((suggestion) => (
             <button
@@ -92,7 +91,7 @@ export default function Chat() {
 
         <form
           onSubmit={handleSubmit}
-          className="flex items-center gap-2 rounded-t-[18px] border-b-2 border-accent bg-canvas py-2 pr-2 pl-5"
+          className="flex items-center gap-2 rounded-t-[18px] rounded-b-[5px] border-b-2 border-accent bg-canvas py-2 pr-2 pl-5"
         >
           <label htmlFor="chat-input" className="sr-only">
             Din fråga
@@ -117,6 +116,7 @@ export default function Chat() {
           </button>
         </form>
       </footer>
+      <div ref={bottomRef} />
     </section>
   );
 }
