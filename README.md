@@ -51,6 +51,14 @@ embedding_model: text-embedding-3-small
 - Körs lokalt.
 - Minnet försvinner vid omstart.
 
+## Säkerhet i en riktig produkt
+Chatten körs lokalt, så de här hålen är inte fyllda:
+- `thread_id` kontrolleras inte. Den som gissar ett id kan läsa någon annans samtal. Kräv ett UUID eller koppla tråden till en inloggning.
+- Ingen gräns för antal frågor per IP. CORS stoppar bara webbläsare, så ett skript kan bränna API-krediterna.
+- Samtalet växer utan gräns. Begränsa antal frågor eller hur mycket historik som skickas med.
+- Länkar i svaret som inte finns bland källorna kontrolleras inte. En påhittad eller injicerad länk blir klickbar.
+- Minnet ligger i RAM. En riktig produkt behöver en databas för samtalen.
+
 ## Förbättringar
 - Dyrare modell som berikar chunks vid indexeringen
 - Ordsökning (BM25) tillsammans med vektorsökningen
