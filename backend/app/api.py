@@ -3,6 +3,7 @@ import time
 from collections.abc import AsyncIterator
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from langchain_core.messages import HumanMessage, ToolMessage
 from pydantic import BaseModel
@@ -15,6 +16,12 @@ from app.log import log_messages
 config = load_config()
 agent = load_agent(config)
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[config["frontend_url"]],
+    allow_methods=["POST"],
+    allow_headers=["Content-Type"],
+)
 
 
 class ChatQuestion(BaseModel):

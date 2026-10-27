@@ -16,3 +16,5 @@ embedding_price_per_m: 0.02
 
 k: 5
 score_threshold: 0.3
+
+frontend_url: http://localhost:3000

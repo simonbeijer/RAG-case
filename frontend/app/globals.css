@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-display: var(--font-space-grotesk), sans-serif;
+
+  --color-canvas: #f4f5f9;
+  --color-ink: #0b0d17;
+  --color-muted: #4a4f63;
+  --color-line: #e6e8ef;
+  --color-accent: #2b3cf0;
+  --color-accent-soft: #dce0ff;
+  --color-lavender: #b9c0ff;
+}
